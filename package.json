@@ -13,7 +13,8 @@
     "check": "npm run typecheck && npm test && npm run build",
     "e2e": "npm run build && node tests/e2e/extension.e2e.mjs",
     "test:agent": "agent/macos/test.sh",
-    "e2e:agent": "npm run build && swift build --package-path agent/macos && node tests/e2e/native-messaging.e2e.mjs"
+    "e2e:agent": "npm run build && swift build --package-path agent/macos && node tests/e2e/native-messaging.e2e.mjs",
+    "screenshots": "npm run build && swift build --package-path agent/macos && node scripts/screenshots.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.5",

@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - name: Typecheck, unit tests, build the extension
+        run: npm run check
+
+      - name: Swift agent tests
+        run: npm run test:agent
+
+      - name: Install Chromium for the end-to-end tests
+        run: npx playwright-core install chromium
+
+      - name: Extension end-to-end
+        run: npm run e2e
+
+      - name: Extension ⇄ agent end-to-end (native messaging)
+        run: npm run e2e:agent

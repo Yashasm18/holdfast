@@ -1,11 +1,11 @@
 #!/bin/bash
-# Runs `swift test`. With Xcode that's all it takes; with only the Command Line
-# Tools, SwiftPM runs swift-testing suites only when its framework path is passed
-# on the command line, so pass it here.
+# Runs `swift test`. With Xcode that's all it takes. With only the Command Line
+# Tools, swift-testing is installed but off the search paths, and SwiftPM only
+# runs its suites when the framework path is on the command line, so add it.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-CLT_FRAMEWORKS="/Library/Developer/CommandLineTools/Library/Developer/Frameworks"
-if [[ ! -d /Applications/Xcode.app && -d "$CLT_FRAMEWORKS/Testing.framework" ]]; then
-  exec swift test --package-path "$HERE" -Xswiftc -F -Xswiftc "$CLT_FRAMEWORKS" "$@"
+if [[ "$(xcode-select -p 2>/dev/null)" == *CommandLineTools* ]]; then
+  export HOLDFAST_CLT_TESTING=1
+  exec swift test --package-path "$HERE" -Xswiftc -F -Xswiftc /Library/Developer/CommandLineTools/Library/Developer/Frameworks "$@"
 fi
 exec swift test --package-path "$HERE" "$@"

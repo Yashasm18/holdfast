@@ -1,12 +1,11 @@
 // swift-tools-version:6.0
-import Foundation
 import PackageDescription
 
 // Xcode finds swift-testing on its own. The standalone Command Line Tools ship it
-// too but leave it off the default search paths, so point at it when there's no Xcode.
+// too but leave it off the default search paths; test.sh sets HOLDFAST_CLT_TESTING
+// when the active developer directory is the Command Line Tools.
 let cltDeveloper = "/Library/Developer/CommandLineTools/Library/Developer"
-let needsCLTTesting = !FileManager.default.fileExists(atPath: "/Applications/Xcode.app")
-    && FileManager.default.fileExists(atPath: "\(cltDeveloper)/Frameworks/Testing.framework")
+let needsCLTTesting = Context.environment["HOLDFAST_CLT_TESTING"] == "1"
 let testSwiftSettings: [SwiftSetting] = needsCLTTesting
     ? [.unsafeFlags(["-F", "\(cltDeveloper)/Frameworks"])] : []
 let testLinkerSettings: [LinkerSetting] = needsCLTTesting
