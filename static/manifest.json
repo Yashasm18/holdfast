@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Holdfast",
+  "version": "0.1.0",
+  "description": "Block distracting websites on a schedule, with locks you can't cheat. Free and open source.",
+  "minimum_chrome_version": "120",
+  "permissions": ["declarativeNetRequest", "storage", "alarms", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "incognito": "spanning",
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_popup": "popup.html", "default_title": "Holdfast" },
+  "options_page": "options.html",
+  "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }]
+}

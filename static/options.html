@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Holdfast blocks</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    main { max-width: 760px; margin: 0 auto; padding: 24px 16px; }
+    .days { display: flex; gap: 4px; flex-wrap: wrap; }
+    .days label { display: inline-flex; gap: 4px; margin: 0; font-weight: 400; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="row spread"><h1>Your blocks</h1><button id="new" class="primary">New block</button></div>
+    <p class="muted">
+      One pattern per line: <code>youtube.com</code> blocks the site and its subdomains,
+      <code>reddit.com/r/all</code> blocks a path, <code>*</code> is a wildcard, and a plain word like
+      <code>casino</code> blocks any URL containing it.
+    </p>
+    <div id="blocks"></div>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
