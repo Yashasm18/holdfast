@@ -59,6 +59,11 @@ export function validateEdit(before: Block, after: Block, now: number): Verdict 
     return no("Websites can't be removed from a locked block.");
   }
 
+  const afterApps = new Set(after.apps ?? []);
+  if ((before.apps ?? []).some((app) => !afterApps.has(app))) {
+    return no("Apps can't be removed from a locked block.");
+  }
+
   const beforeExceptions = asSet(before.exceptions);
   if ([...asSet(after.exceptions)].some((e) => !beforeExceptions.has(e))) {
     return no("Exceptions can't be added to a locked block.");

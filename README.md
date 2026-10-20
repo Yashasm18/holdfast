@@ -18,8 +18,10 @@ mean "I'll just turn it off for a minute" stops working.
 - **Locked means locked**: while a block is locked you can add sites or extend
   its schedule, but you can't remove sites, add exceptions, shorten it, weaken
   the lock, or delete it.
+- **App blocking on macOS** with the optional agent: quit distracting apps while
+  a block runs, and keep the extension from being removed while it's locked.
 - **Private by design**: no account, no server, no tracking. Everything stays
-  in your browser.
+  on your machine.
 
 ## Install (from source)
 
@@ -32,6 +34,26 @@ Then in Chrome, Edge, Brave, Arc or another Chromium browser: open
 `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and
 pick `dist/extension`. To make it apply in private windows too, open the
 extension's details and turn on **Allow in Incognito**.
+
+### macOS agent (optional)
+
+The extension blocks websites. The optional macOS agent also **quits blocked
+apps**, restarts itself if it's killed, and, while a block is locked, closes
+Chromium browsers that don't have Holdfast installed and refuses to uninstall.
+It's a small Swift program that installs per user, no `sudo` needed:
+
+```bash
+cd agent/macos
+./install.sh             # add --strict to also quit Activity Monitor and Terminal while locked
+```
+
+This builds the agent and registers it as a `KeepAlive` LaunchAgent and as a
+native messaging host for Chrome, Edge and Brave (plus Chromium, Vivaldi and Arc
+if installed). Reload the extension afterwards so it syncs your blocks. Then
+list Mac apps to quit in a block's **Quit these Mac apps** box, by bundle ID
+(`osascript -e 'id of app "Steam"'` prints one). Remove it with
+`./uninstall.sh`, which refuses while a block is locked. Details, settings and
+limits: [docs/macos-agent.md](docs/macos-agent.md).
 
 ## How it works
 
@@ -54,6 +76,8 @@ npm test          # unit tests for the core rules
 npm run typecheck
 npm run e2e       # loads the built extension into Chromium and checks real blocking
 npm run watch     # rebuild on change
+npm run test:agent   # Swift tests for the macOS agent
+npm run e2e:agent    # extension ⇄ agent sync over native messaging, in a throwaway profile
 ```
 
 `npm run e2e` needs a Chromium that allows unpacked extensions: Playwright's
@@ -62,9 +86,7 @@ ignores `--load-extension`.
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md). The big next step is a **macOS
-agent** that blocks apps, restarts itself if killed, and keeps the extension
-from being removed during a locked block.
+See [docs/roadmap.md](docs/roadmap.md).
 
 ## Background
 

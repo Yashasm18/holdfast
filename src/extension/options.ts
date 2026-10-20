@@ -37,6 +37,7 @@ function editor({ block, active, locked }: BlockStatus): HTMLElement {
   const name = el("input", { value: block.name });
   const websites = el("textarea", { value: block.websites.join("\n") });
   const exceptions = el("textarea", { value: block.exceptions.join("\n") });
+  const apps = el("textarea", { value: (block.apps ?? []).join("\n"), placeholder: "com.valvesoftware.steam" });
   const start = el("input", { type: "time", value: toTime(first?.start ?? 9 * 60) });
   const end = el("input", { type: "time", value: toTime(first?.end ?? 17 * 60) });
   const dayBoxes = DAYS.map((label, day) =>
@@ -57,6 +58,7 @@ function editor({ block, active, locked }: BlockStatus): HTMLElement {
       name: name.value.trim() || "Untitled block",
       websites: lines(websites.value),
       exceptions: lines(exceptions.value),
+      apps: lines(apps.value),
       schedule,
       lock: lockFromSelect(lock),
     };
@@ -88,6 +90,8 @@ function editor({ block, active, locked }: BlockStatus): HTMLElement {
       el("div", {}, el("label", { textContent: "Block these websites" }), websites),
       el("div", {}, el("label", { textContent: "Always allow (exceptions)" }), exceptions),
     ),
+    el("label", { textContent: "Quit these Mac apps (bundle IDs, needs the macOS agent)" }),
+    apps,
     el("label", { textContent: "Schedule" }),
     el(
       "div",

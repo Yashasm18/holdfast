@@ -7,6 +7,8 @@ import type { Request, Response } from "./messages";
 
 const BLOCK_PAGE = chrome.runtime.getURL("blocked.html");
 const TICK = "holdfast-tick";
+/** Native messaging host registered by the macOS agent (agent/macos/install.sh). */
+const AGENT_HOST = "app.holdfast.agent";
 
 async function loadBlocks(): Promise<Block[]> {
   const { blocks } = await chrome.storage.local.get("blocks");
@@ -15,7 +17,32 @@ async function loadBlocks(): Promise<Block[]> {
 
 async function saveBlocks(blocks: Block[]): Promise<void> {
   await chrome.storage.local.set({ blocks });
+  await syncWithAgent(blocks);
   await enforce();
+}
+
+interface AgentReply {
+  type: "synced";
+  blocks: Block[];
+  /** Ids of locked blocks the agent had that this browser was missing. */
+  restored: string[];
+}
+
+/**
+ * Hand our blocks to the macOS agent, if it's installed. The agent keeps a copy
+ * and sends back any locked blocks we've lost (extension reinstalled, storage
+ * wiped), which we adopt. Without the agent this is a no-op.
+ */
+async function syncWithAgent(blocks: Block[]): Promise<void> {
+  let reply: AgentReply | undefined;
+  try {
+    reply = await chrome.runtime.sendNativeMessage(AGENT_HOST, { type: "sync", blocks });
+  } catch {
+    return; // agent not installed
+  }
+  if (reply?.type === "synced" && reply.restored.length > 0) {
+    await chrome.storage.local.set({ blocks: reply.blocks });
+  }
 }
 
 /** Recompute which blocks are active and push matching rules into the browser. */
@@ -118,13 +145,19 @@ chrome.runtime.onMessage.addListener((request: Request, _sender, reply) => {
   return true;
 });
 
+// Each tick also re-syncs with the agent, which doubles as its heartbeat.
+const syncAndEnforce = async () => {
+  await syncWithAgent(await loadBlocks());
+  await enforce();
+};
+
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === TICK) void enforce();
+  if (alarm.name === TICK) void syncAndEnforce();
 });
 
 const start = () => {
   void chrome.alarms.create(TICK, { periodInMinutes: 1 });
-  void enforce();
+  void syncAndEnforce();
 };
 chrome.runtime.onInstalled.addListener(start);
 chrome.runtime.onStartup.addListener(start);

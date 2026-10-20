@@ -8,6 +8,13 @@ src/core/           pure TypeScript, no browser APIs, fully unit-tested
   locks.ts          is it locked? can it be stopped/deleted? is an edit allowed?
   dnr.ts            active blocks → declarativeNetRequest rules
 
+tests/fixtures/     lock-semantics.json, run by both the TS core and the Swift agent
+
+agent/macos/        Swift macOS agent (see macos-agent.md)
+  HoldfastAgentCore block model, lock semantics port, blocks.json store,
+                    native messaging, Chromium profile checks, quit decisions
+  holdfast-agent    daemon (NSWorkspace) + native messaging host + CLI
+
 src/extension/      Chrome MV3 extension
   background.ts     the only writer of state; enforces lock rules; syncs rules
   messages.ts       request/response types between UI pages and background
@@ -43,7 +50,7 @@ when the browser closes), and shown unselectable with paste disabled.
 ## Known limits of an extension-only blocker
 
 Someone can still remove or disable the extension, use another browser, or
-edit extension storage from DevTools. These are the gaps the planned macOS
-agent closes (see [roadmap](roadmap.md)): a `KeepAlive` launch agent that
-re-applies browser policies forcing the extension on, closes browsers without
-it, and blocks apps.
+edit extension storage from DevTools. The macOS agent ([macos-agent.md](macos-agent.md))
+closes most of these: a `KeepAlive` LaunchAgent that keeps a copy of the
+blocks (restoring locked ones the extension loses), quits Chromium browsers
+without the extension while a block is locked, and blocks apps.

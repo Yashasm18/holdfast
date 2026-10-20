@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template: install.sh fills in __BINARY__ and __LOGS__ and copies it to ~/Library/LaunchAgents. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>app.holdfast.agent</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__BINARY__</string>
+		<string>run</string>
+	</array>
+	<!-- Start at login, and restart whenever the agent exits or is killed. -->
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>5</integer>
+	<!-- Needs the logged-in GUI session to see and quit apps. -->
+	<key>LimitLoadToSessionType</key>
+	<string>Aqua</string>
+	<key>StandardOutPath</key>
+	<string>__LOGS__/agent.log</string>
+	<key>StandardErrorPath</key>
+	<string>__LOGS__/agent.log</string>
+</dict>
+</plist>

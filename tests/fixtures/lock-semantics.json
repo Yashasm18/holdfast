@@ -1,0 +1,21 @@
+{
+  "about": "Shared cases for isBlockActive and isLocked. Run by src/core/fixtures.test.ts (TypeScript) and agent/macos/Tests (Swift) so both implementations agree. `now` is local wall-clock time; runningUntilMinutes and lock.untilMinutes are minutes after `now` (null = not running). 2026-10-21 is a Wednesday.",
+  "cases": [
+    { "name": "no schedule, not running", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": null, "lock": { "type": "none" } }, "expect": { "active": false, "locked": false } },
+    { "name": "manual run without a lock", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 60, "lock": { "type": "none" } }, "expect": { "active": true, "locked": false } },
+    { "name": "manual run that already ended", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": -1, "lock": { "type": "untilEnd" } }, "expect": { "active": false, "locked": false } },
+    { "name": "manual run ending exactly now", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 0, "lock": { "type": "untilEnd" } }, "expect": { "active": false, "locked": false } },
+    { "name": "timer lock before its time", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 60, "lock": { "type": "timer", "untilMinutes": 30 } }, "expect": { "active": true, "locked": true } },
+    { "name": "timer lock at its time", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 60, "lock": { "type": "timer", "untilMinutes": 0 } }, "expect": { "active": true, "locked": false } },
+    { "name": "random-text lock while running", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 60, "lock": { "type": "randomText", "length": 30 } }, "expect": { "active": true, "locked": true } },
+    { "name": "until-end lock while running", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": 60, "lock": { "type": "untilEnd" } }, "expect": { "active": true, "locked": true } },
+    { "name": "timer lock on an inactive block", "now": "2026-10-21T10:30", "block": { "schedule": [], "runningUntilMinutes": null, "lock": { "type": "timer", "untilMinutes": 60 } }, "expect": { "active": false, "locked": false } },
+    { "name": "inside a weekly window", "now": "2026-10-21T10:30", "block": { "schedule": [{ "day": 3, "start": 540, "end": 1020 }], "runningUntilMinutes": null, "lock": { "type": "untilEnd" } }, "expect": { "active": true, "locked": true } },
+    { "name": "window start is inclusive", "now": "2026-10-21T09:00", "block": { "schedule": [{ "day": 3, "start": 540, "end": 1020 }], "runningUntilMinutes": null, "lock": { "type": "none" } }, "expect": { "active": true, "locked": false } },
+    { "name": "window end is exclusive", "now": "2026-10-21T17:00", "block": { "schedule": [{ "day": 3, "start": 540, "end": 1020 }], "runningUntilMinutes": null, "lock": { "type": "untilEnd" } }, "expect": { "active": false, "locked": false } },
+    { "name": "window on another weekday", "now": "2026-10-21T10:30", "block": { "schedule": [{ "day": 2, "start": 540, "end": 1020 }], "runningUntilMinutes": null, "lock": { "type": "untilEnd" } }, "expect": { "active": false, "locked": false } },
+    { "name": "Sunday is day 0", "now": "2026-10-25T23:59", "block": { "schedule": [{ "day": 0, "start": 0, "end": 1440 }], "runningUntilMinutes": null, "lock": { "type": "randomText", "length": 120 } }, "expect": { "active": true, "locked": true } },
+    { "name": "Saturday window until midnight", "now": "2026-10-24T23:30", "block": { "schedule": [{ "day": 6, "start": 1320, "end": 1440 }], "runningUntilMinutes": null, "lock": { "type": "untilEnd" } }, "expect": { "active": true, "locked": true } },
+    { "name": "manual run outlives a finished window", "now": "2026-10-21T18:00", "block": { "schedule": [{ "day": 3, "start": 540, "end": 1020 }], "runningUntilMinutes": 15, "lock": { "type": "timer", "untilMinutes": 10 } }, "expect": { "active": true, "locked": true } }
+  ]
+}

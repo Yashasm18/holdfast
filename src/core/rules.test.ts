@@ -87,6 +87,11 @@ describe("validateEdit on a locked block", () => {
   it("rejects removing a website", () => {
     expect(validateEdit(locked, { ...locked, websites: ["youtube.com"] }, WED_1030).ok).toBe(false);
   });
+  it("rejects removing an app but allows adding one", () => {
+    const withApp = { ...locked, apps: ["com.valvesoftware.steam"] };
+    expect(validateEdit(withApp, { ...withApp, apps: [] }, WED_1030).ok).toBe(false);
+    expect(validateEdit(locked, withApp, WED_1030)).toEqual({ ok: true });
+  });
   it("rejects adding an exception", () => {
     expect(validateEdit(locked, { ...locked, exceptions: [...locked.exceptions, "reddit.com"] }, WED_1030).ok).toBe(false);
   });

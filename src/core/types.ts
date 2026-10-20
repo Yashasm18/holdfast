@@ -27,6 +27,8 @@ export interface Block {
   websites: string[];
   /** Patterns that are always allowed, even if a website pattern matches. */
   exceptions: string[];
+  /** macOS app bundle IDs the Holdfast agent quits while the block is active. */
+  apps?: string[];
   /** Weekly windows when the block runs. Empty = only runs when started manually. */
   schedule: ScheduleWindow[];
   /** Set when the block is started manually; epoch ms, or null when not running manually. */
